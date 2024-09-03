@@ -89,4 +89,4 @@ These are the default accounts seeded into the database. Use them for different 
 
 [dc]: https://docs.docker.com/compose/
 [app]: http://localhost:4000
-[license-shield]: https://img.shields.io/github/license/ebukaodini/simple-learning-api.svg?style=flat-square
+[license-shield]: https://img.shields.io/github/license/ebukaodini/etap-lms.svg?style=flat-square
