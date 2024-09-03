@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  app:
+    build: ./app/
+    container_name: etap-lms-app
+    env_file:
+      - ./app/.env
+    ports:
+      - "4000:4000"
+    links:
+      - api
+    volumes:
+      - ./app/:/app/
+    depends_on:
+      - api
+  api:
+    build: ./api/
+    container_name: etap-lms-api
+    env_file:
+      - ./api/.env
+    ports:
+      - "3000:3000"
+    links:
+      - db
+    volumes:
+      - ./api/:/app/
+    depends_on:
+      - db
+  db:
+    build:
+      context: ./api/db
+      dockerfile: Dockerfile
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=simple_learning_db
+      - ALLOW_IP_RANGE=0.0.0.0/0
+    ports:
+      - "5432:5432"
+    volumes:
+      - "pg_data:/var/lib/postgresql"
+    restart: always
+volumes:
+  pg_data:

@@ -1,0 +1,1 @@
+CREATE DATABASE simple_learning_db;

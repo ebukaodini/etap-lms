@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  LEARNER
+  TEACHER
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  firstName String   @map("first_name")
+  lastName  String   @map("last_name")
+  role      Role
+  createdAt DateTime @default(now()) @map("created_at")
+
+  subjects LearnerSubject[]
+  lessons  LearnerLesson[]
+
+  @@map("users")
+}
+
+model Subject {
+  id          Int      @id @default(autoincrement())
+  title       String   @unique
+  description String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  lessons  Lesson[]
+  learners LearnerSubject[]
+
+  @@map("subjects")
+}
+
+model Lesson {
+  id          Int    @id @default(autoincrement())
+  title       String @unique
+  description String
+  videoLink   String @map("video_link")
+
+  subjectId Int      @map("subject_id")
+  subject   Subject? @relation(fields: [subjectId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  learners LearnerLesson[]
+
+  @@map("lessons")
+}
+
+model LearnerSubject {
+  id Int @id @default(autoincrement())
+
+  userId  Int
+  learner User? @relation(fields: [userId], references: [id])
+
+  subjectId Int      @map("subject_id")
+  subject   Subject? @relation(fields: [subjectId], references: [id])
+
+  completed Boolean  @default(false)
+  startedAt DateTime @default(now()) @map("started_at")
+
+  lessons LearnerLesson[]
+
+  @@map("learner_subjects")
+}
+
+model LearnerLesson {
+  id Int @id @default(autoincrement())
+
+  userId  Int
+  learner User? @relation(fields: [userId], references: [id])
+
+  lessonId Int     @map("lesson_id")
+  lesson   Lesson? @relation(fields: [lessonId], references: [id])
+
+  learnerSubjectId Int             @map("learner_subject_id")
+  learnerSubject   LearnerSubject? @relation(fields: [learnerSubjectId], references: [id])
+
+  completed Boolean  @default(false)
+  startedAt DateTime @default(now()) @map("started_at")
+
+  @@map("learner_lessons")
+}
